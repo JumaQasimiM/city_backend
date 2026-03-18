@@ -24,9 +24,14 @@ SECRET_KEY = 'django-insecure-y4)q!8q&!q%=o!p9v*g$0eu1yj0xphjaq1vc5$o#xl^n#lnxqg
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+# for productions
+# DEBUG = False 
 ALLOWED_HOSTS = []
 
+
+
+# custom user 
+# AUTH_USER_MODEL = "accounts.User"
 
 # Application definition
 
@@ -37,6 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # apps
+    'place',
+    'city',
+    'category',
+    'country'
 ]
 
 MIDDLEWARE = [
@@ -115,3 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES = [
+    BASE_DIR / 'static'
+]

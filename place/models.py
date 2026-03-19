@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from city.models import City
 from category.models import Category
 
+
 # Create your models here.
 
 class Place(models.Model):

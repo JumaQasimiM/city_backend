@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 
 # custom user 
-# AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.User"
 
 # Application definition
 
@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'place',
     'city',
     'category',
-    'country'
+    'country',
+    'accounts'
+
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.conf import settings
 
 from city.models import City
 from category.models import Category
@@ -19,7 +19,7 @@ class Place(models.Model):
     description = models.TextField( blank=True,null=False)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
     services = models.ManyToManyField(Service,related_name='places')
     register_date = models.DateField(auto_now=True)
     

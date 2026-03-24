@@ -5,6 +5,7 @@ from django.db import models
 class Category(models.Model):
     title = models.CharField(max_length=50)
     
+    # have error
 # model configuration (database + admin display)
 class Meta:
     db_table = 'categories_table'  # custom table name in database

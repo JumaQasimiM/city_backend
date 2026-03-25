@@ -5,6 +5,8 @@ from django.db import models
 class Category(models.Model):
     title = models.CharField(max_length=50)
     
+    def __str__(self):
+        return self.title
     # have error
 # model configuration (database + admin display)
 class Meta:
@@ -12,6 +14,5 @@ class Meta:
     verbose_name = 'Category'  # singular name in admin panel
     verbose_name_plural = 'Categories'  # plural name in admin panel
 
-    def __str__(self):
-        return self.title
+    
     

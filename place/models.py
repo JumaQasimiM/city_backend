@@ -15,12 +15,31 @@ class Service(models.Model):
         return self.title
     
 class Place(models.Model):
+    CATEGORY_CHOICES =[
+        ('tourist','Tourist Attraction'),
+        ('market','Market'),
+        ('restaurant','Restaurant'),
+        ('park','Park'),
+        ('museum','Museum'),
+        ('hotel','Hotel'),
+        ('hospital','Hospital'),
+        ('other','Other')
+    ]
     name = models.CharField(max_length=40)
     description = models.TextField( blank=True,null=False)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
     services = models.ManyToManyField(Service,related_name='places')
+    # geo
+    latitude = models.DecimalField(max_digits=9,decimal_places=6,null=True,blank=True)
+    longitude = models.DecimalField(max_digits=9,decimal_places=6,null=True,blank=True)
+    # addrerss
+    address = models.CharField(max_length=300, blank=True)
+    # other descriptions
+    opening_hours = models.CharField(max_length=100,blank=True)
+    contact_number = models.CharField(max_length=20,blank=True,null=True)
+    website = models.URLField(blank=True,null=True)
     register_date = models.DateField(auto_now=True)
     
  # model configuration (database + admin display)

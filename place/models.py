@@ -52,6 +52,7 @@ class Place(models.Model):
             models.Index(fields=['name','category'])
         ]
   
+    # show in admin panel
     def __str__(self):
         return self.name
 
@@ -63,3 +64,18 @@ class PlaceImage(models.Model):
 
     def __str__(self):
         return f'Image for {self.place.name}'
+
+# favorate place
+class FavoratePlace(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='favorates')
+    
+# place commetns 
+class PlaceComment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='comments')
+    comment = models.TextField(null=False,blank=False)
+# place like
+class PlaceLike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='likes')

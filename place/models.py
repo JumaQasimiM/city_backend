@@ -6,7 +6,6 @@ from city.models import City
 from category.models import Category
 
 
-# Create your models here.
 # services 
 class Service(models.Model):
     title = models.CharField(max_length=200)
@@ -67,15 +66,24 @@ class PlaceImage(models.Model):
 
 # favorate place
 class FavoratePlace(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='favorate_user')
     place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='favorates')
+
+    def __str__(self):
+        return f'{self.user.username} add to favorate [ {self.place.name} ]' 
     
 # place commetns 
 class PlaceComment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='comment_user')
     place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='comments')
     comment = models.TextField(null=False,blank=False)
+
+    def __str__(self):
+        return f"{self.user.username} comment - [ {self.comment} ] to {self.place.name} "
 # place like
 class PlaceLike(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='like_uers')
     place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='likes')
+
+    def __str__(self):
+        return f" '{self.user.username}' liked {self.place.name}"

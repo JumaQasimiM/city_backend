@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'city',
     'category',
     'country',
-    'accounts'
+    'accounts',
+    'blog'
 
 ]
 

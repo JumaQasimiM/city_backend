@@ -12,8 +12,8 @@ class Blog(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='blogs')
     views = models.IntegerField(default=1)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True) # one time
+    updated_at = models.DateTimeField(auto_now=True) # after evry save
 
     class Meta:
         db_table = 'blogs'

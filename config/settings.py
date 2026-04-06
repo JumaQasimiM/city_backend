@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'category',
     'country',
     'accounts',
-    'blog'
+    'blog',
+    'rest_framework'
 
 ]
 

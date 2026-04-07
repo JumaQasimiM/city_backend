@@ -26,7 +26,7 @@ class Blog(models.Model):
 # blog comment  
 class BlogComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='blog_comments')
-    blog = models.ForeignKey(Blog,on_delete=models.CASCADE,related_name='blog')
+    blog = models.ForeignKey(Blog,on_delete=models.CASCADE,related_name='comments')
     comment = models.TextField(null=False,blank=False)
 
     class Meta:
@@ -34,5 +34,5 @@ class BlogComment(models.Model):
 
     def __str__(self):
         # maybe the user be null (on_delete = set_null)
-        username = self.user.username if self.user else 'Anonymose'
+        username = self.user.username if self.user else 'Anonymous'
         return f"{username} comment - [ {self.comment} ] to {self.blog.title} "

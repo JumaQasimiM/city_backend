@@ -1,40 +1,88 @@
 from rest_framework import serializers
-from . import models 
+from . import models
+
 from category.models import Category
 from category.serializers import CategorySerializer
+
 from accounts.models import User
 from accounts.serializers import UserSerializer
+
 from city.models import City
 from city.serializers import CitySerializer
 
 
-class PlaceSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = models.Place
-        fields = '__all__'
-
-class PlaceImageSerialzer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PlaceImage
-        fields = '__all__'
-    
+# 🔹 Service
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Service
         fields = '__all__'
 
+
+# 🔹 Place
+class PlaceSerializer(serializers.ModelSerializer):
+    # write (POST)
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all()
+    )
+    city = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all()
+    )
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all()
+    )
+    services = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=models.Service.objects.all()
+    )
+
+    # read (GET)
+    category_detail = CategorySerializer(source='category', read_only=True)
+    city_detail = CitySerializer(source='city', read_only=True)
+    owner_detail = UserSerializer(source='owner', read_only=True)
+    services_detail = ServiceSerializer(source='services', many=True, read_only=True)
+
+    class Meta:
+        model = models.Place
+        fields = '__all__'
+
+
+# 🔹 Place Image
+class PlaceImageSerializer(serializers.ModelSerializer):
+    # write
+    place = serializers.PrimaryKeyRelatedField(
+        queryset=models.Place.objects.all()
+    )
+
+    # read
+    place_detail = PlaceSerializer(source='place', read_only=True)
+
+    class Meta:
+        model = models.PlaceImage
+        fields = '__all__'
+
+
+# 🔹 Comment
 class PlaceCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = models.PlaceComment
         fields = '__all__'
 
-class FavoratePlaceSerializer(serializers.ModelSerializer):
+
+# 🔹 Favorite
+class FavoritePlaceSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = models.FavoratePlace
         fields = '__all__'
 
+
+# 🔹 Like
 class PlaceLikeSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = models.PlaceLike
         fields = '__all__'

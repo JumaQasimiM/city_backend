@@ -12,6 +12,9 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_username(self, username):
+        if 'admin' in username:
+            raise serializers.ValidationError('username is not allowd!')
+        
         if len(username) < 3:
             raise serializers.ValidationError(
                 'Username must be at least 3 characters'

@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns =[
     path('',views.categories,name='category_list'),
-    path('category_detail/<int:pk>/',views.category_detail)
+    path('create',views.create_category),
+    path('category_detail/<int:pk>/',views.category_detail),
+    path('delete_category/<int:pk>/',views.delete_category),
     
 ]

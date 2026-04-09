@@ -1,33 +1,63 @@
 from django.shortcuts import get_object_or_404
-
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Category
 from .serializers import CategorySerializer
 
+"""
+Category API (using api_view for learning DRF)
+
+Endpoints:
+1. categories          -> list all categories
+2. create_category     -> create a new category
+3. update_category     -> update an existing category
+4. delete_category     -> delete a category
+5. category_detail     -> retrieve a single category
+"""
 
 # list categories
 
 @api_view(['GET'])
 def categories(request):
     categories = Category.objects.all()
+    # categories = Category.objects.prefetch_related('places').all()
     serializer = CategorySerializer(categories,many= True)
-    return Response(serializer.data,status=200)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
 # create new category
 
-@api_view(['POST'])
+@api_view(['POST']) 
 def create_category(request):
-    pass
+    serializer = CategorySerializer(data = request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # update category
-@api_view(['PUT'])
+@api_view(['PUT','PUTCH'])
 def update_category(request,pk):
-    pass
+    category  = get_object_or_404(Category,pk=pk)
+    serializer = CategorySerializer(category,data = request.data,partial=True )
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 # delete category
 
 @api_view(['DELETE'])
 def delete_category(request,pk):
-    pass
+    category  = get_object_or_404(Category,pk=pk)
+    if category.places.exists():
+        return Response(
+            {'error':'Can not delete category with existing place.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    category.delete()
+    return Response( {'message': 'category removed successfully'},status=status.HTTP_200_OK)   
 
 # get one category --- category detail
 
@@ -35,4 +65,4 @@ def delete_category(request,pk):
 def category_detail(request,pk):
     category =get_object_or_404(Category,pk=pk)
     serializer = CategorySerializer(category)
-    return Response(serializer.data)
+    return Response(serializer.data,status=status.HTTP_200_OK)

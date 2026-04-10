@@ -6,5 +6,6 @@ urlpatterns =[
     path('create',views.create_category),
     path('category_detail/<int:pk>/',views.category_detail),
     path('delete_category/<int:pk>/',views.delete_category),
+    path('update_category/<int:pk>/',views.update_category)
     
 ]

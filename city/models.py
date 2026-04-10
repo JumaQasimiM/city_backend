@@ -6,7 +6,7 @@ from country.models import Country
 class City(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField()
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='cities')
 
  # model configuration (database + admin display)
     class Meta:

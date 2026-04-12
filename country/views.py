@@ -3,56 +3,130 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Country
-from.serializers import CountrySerializer
+from .serializers import CountrySerializer
 
 
+"""
+Country API (DRF - function based views)
+
+This API provides basic CRUD operations for Country model.
+
+Endpoints:
+--------------------------------------------------
+GET     /countries/          -> List all countries
+POST    /countries/          -> Create a new country
+
+GET     /countries/<id>/     -> Retrieve a single country
+PATCH   /countries/<id>/     -> Partially update a country
+DELETE  /countries/<id>/     -> Delete a country (if no related cities)
+--------------------------------------------------
+"""
 
 
-
-
-# REST method
-
-'''
-GET: list all countriew
-POST: create new country
-'''
-@api_view(['GET','POST'])
+# ==============================
+# LIST & CREATE
+# ==============================
+"""
+GET  : return all countries
+POST : create a new country
+"""
+@api_view(['GET', 'POST'])
 def create_list_country(request):
-    if request.method =='GET':
+    # ---------- GET: list all countries ----------
+    if request.method == 'GET':
         countries = Country.objects.all()
-        serializer = CountrySerializer(countries,many =True)
-        return Response(serializer.data)
-    elif request.method =='POST':
-        serializer = CountrySerializer(data = request.data)
+        serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # ---------- POST: create new country ----------
+    elif request.method == 'POST':
+        serializer = CountrySerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            return Response({'success':'country created successfully.'},status=status.HTTP_201_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    'success': True,
+                    'message': 'Country created successfully.',
+                    'data': serializer.data
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            {
+                'success': False,
+                'message': 'Validation error',
+                'errors': serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
+# ==============================
+# DETAIL / UPDATE / DELETE
+# ==============================
+"""
+GET    : retrieve a single country
+PATCH  : update country partially
+DELETE : delete country (only if no related cities)
+"""
+@api_view(['GET', 'PATCH', 'DELETE'])
+def country_detail(request, pk):
 
-@api_view(['GET','DELETE','PATCH'])
-def country_detail(request,pk):
+    # get object or return 404
+    country = get_object_or_404(Country, pk=pk)
+
+    # ---------- GET: retrieve ----------
     if request.method == 'GET':
-        country = get_object_or_404(Country, pk = pk)
         serializer = CountrySerializer(country)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # ---------- DELETE ----------
     elif request.method == 'DELETE':
-        country = get_object_or_404(Country,pk = pk)
+        # prevent delete if related cities exist
         if country.cities.exists():
             return Response(
-                {'error':'Can not delete country with existing city.'},
-                status=status.HTTP_204_BAD_REQUEST
+                {
+                    'success': False,
+                    'message': 'Cannot delete country with existing cities.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
-        country.delete()
-        return Response( {'success': 'country removed successfully'},status=status.HTTP_200_OK)   
 
+        country.delete()
+        return Response(
+            {
+                'success': True,
+                'message': 'Country removed successfully.'
+            },
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+    # ---------- PATCH: partial update ----------
     elif request.method == 'PATCH':
-        country = get_object_or_404(Country,pk=pk)
-        serializer = CountrySerializer(country, data = request.data, partial=True)
+        serializer = CountrySerializer(
+            country,
+            data=request.data,
+            partial=True
+        )
+
         if serializer.is_valid():
             serializer.save()
-            return Response({'success':'Country updated successfully!','data':serializer.data},status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    'success': True,
+                    'message': 'Country updated successfully.',
+                    'data': serializer.data
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {
+                'success': False,
+                'message': 'Validation error',
+                'errors': serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -16,17 +16,15 @@ Endpoints:
 5. category_detail     -> retrieve a single category
 """
 
-# list categories
+# GET: get all categories
 
 @api_view(['GET'])
 def categories(request):
     categories = Category.objects.all()
-    # categories = Category.objects.prefetch_related('places').all()
     serializer = CategorySerializer(categories,many= True)
     return Response(serializer.data,status=status.HTTP_200_OK)
 
-# create new category
-
+# POST: create new category
 @api_view(['POST']) 
 def create_category(request):
     serializer = CategorySerializer(data = request.data)
@@ -36,8 +34,8 @@ def create_category(request):
         return Response({'success','New Category create successfully!'})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# update category
-@api_view(['PUT','PUTCH'])
+# PATCH: update category
+@api_view(['PATCH','PUT'])
 def update_category(request,pk):
     category  = get_object_or_404(Category,pk=pk)
     serializer = CategorySerializer(category,data = request.data,partial=True )
@@ -46,8 +44,7 @@ def update_category(request,pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# delete category
+# DELETE: delete category
 
 @api_view(['DELETE'])
 def delete_category(request,pk):
@@ -60,7 +57,7 @@ def delete_category(request,pk):
     category.delete()
     return Response( {'message': 'category removed successfully'},status=status.HTTP_200_OK)   
 
-# get one category --- category detail
+# GET: retrieve a single category --- category detail
 
 @api_view(['GET'])
 def category_detail(request,pk):

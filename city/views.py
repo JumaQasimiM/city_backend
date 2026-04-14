@@ -2,16 +2,34 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# Create your views here.
+
 from .models import City
 from .serializers import CitySerializer
 
+"""
+City API (DRF - function based views)
+
+This API provides basic CRUD operations for City model.
+
+Endpoints:
+--------------------------------------------------
+GET     /cities/          -> List all cities
+POST    /cities/          -> Create a new cities
+
+GET     /cities/<id>/     -> Retrieve a single cities
+PATCH   /cities/<id>/     -> Partially update a cities
+DELETE  /cities/<id>/     -> Delete a cities (if no related Places)
+--------------------------------------------------
+"""
+
 @api_view(['GET','POST'])
 def city_list_create(request):
+    # ---------- GET : retrieve single City --------------
     if request.method == 'GET':
         city  = City.objects.all()
         serializer = CitySerializer(city, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    # ---------- POST : create new City-------------- 
     elif request.method =='POST':
         serializer = CitySerializer(data = request.data)
         if serializer.is_valid():
@@ -42,7 +60,9 @@ def city_detail(request,pk):
     if request.method == 'GET':
         serializer = CitySerializer(city)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    # -------- DELETE : remove a city --------------
     elif request.method =='DELETE':
+        # ----- if related place on this city exists ------
         if city.places.exists():
             return Response(
                             {
@@ -59,6 +79,7 @@ def city_detail(request,pk):
             },
             status=status.HTTP_204_NO_CONTENT
         )
+    # ---------- PATCH : update the city ------------
     elif request.method =='PATCH':
         serializer = CitySerializer(city, data = request.data, partial = True)
         if serializer.is_valid():

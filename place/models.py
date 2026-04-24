@@ -14,16 +14,6 @@ class Service(models.Model):
         return self.title
     
 class Place(models.Model):
-    CATEGORY_CHOICES =[
-        ('tourist','Tourist Attraction'),
-        ('market','Market'),
-        ('restaurant','Restaurant'),
-        ('park','Park'),
-        ('museum','Museum'),
-        ('hotel','Hotel'),
-        ('hospital','Hospital'),
-        ('other','Other')
-    ]
     name = models.CharField(max_length=40)
     description = models.TextField( blank=True,null=False)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True,blank=True,related_name='places')

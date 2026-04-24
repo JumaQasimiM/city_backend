@@ -24,4 +24,7 @@ urlpatterns = [
     path('api/countries/', include('country.urls')),
     path('api/cities/', include('city.urls')),
     path('api/users/', include('accounts.urls')),
+    # places url - with viewset
+    path('api/',include('place.urls')),
+    path('api/blogs/',include('blog.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

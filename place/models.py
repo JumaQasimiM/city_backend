@@ -29,14 +29,14 @@ class Place(models.Model):
     opening_hours = models.CharField(max_length=100,blank=True)
     contact_number = models.CharField(max_length=20,blank=True,null=True)
     website = models.URLField(blank=True,null=True)
-    register_date = models.DateField(auto_now=True)
+    register_date = models.DateField(auto_now_add=True)
     
  # model configuration (database + admin display)
     class Meta:
         db_table = 'places_table'  # custom table name in database
         verbose_name = 'Place'  # singular name in admin panel
         verbose_name_plural = 'places' # plural name in admin panel
-        ordering = ['city','-register_date']
+        ordering = ['-register_date','city']
         indexes = [
             models.Index(fields=['name','category'])
         ]

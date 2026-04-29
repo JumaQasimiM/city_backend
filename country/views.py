@@ -2,9 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+
 from .models import Country
 from .serializers import CountrySerializer
-
 
 """
 Country API (DRF - function based views)
@@ -32,37 +32,33 @@ POST : create a new country
 """
 @api_view(['GET', 'POST'])
 def create_list_country(request):
-    # ---------- GET: list all countries ----------
+
+    # ---------- GET ----------
     if request.method == 'GET':
         countries = Country.objects.all()
         serializer = CountrySerializer(countries, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
-    # ---------- POST: create new country ----------
+    # ---------- POST ----------
     elif request.method == 'POST':
+        #  check login
+        if not request.user.is_authenticated:
+            return Response({"message": "Login required"}, status=401)
+
+        #  only admin
+        if request.user.role != "admin":
+            return Response({"message": "Permission denied"}, status=403)
+
         serializer = CountrySerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {
-                    'success': True,
-                    'message': 'Country created successfully.',
-                    'data': serializer.data
-                },
-                status=status.HTTP_201_CREATED
+                {"message": "Country created", "data": serializer.data},
+                status=201
             )
 
-        return Response(
-            {
-                'success': False,
-                'message': 'Validation error',
-                'errors': serializer.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-
+        return Response(serializer.errors, status=400)
 # ==============================
 # DETAIL / UPDATE / DELETE
 # ==============================
@@ -73,6 +69,44 @@ DELETE : delete country (only if no related cities)
 """
 @api_view(['GET', 'PATCH', 'DELETE'])
 def country_detail(request, pk):
+
+    country = get_object_or_404(Country, pk=pk)
+
+    # ---------- GET ----------
+    if request.method == 'GET':
+        serializer = CountrySerializer(country)
+        return Response(serializer.data)
+
+    #  check login for protected actions
+    if not request.user.is_authenticated:
+        return Response({"message": "Login required"}, status=401)
+
+    #  admin
+    if request.user.role != "admin":
+        return Response({"message": "Permission denied"}, status=403)
+
+    # ---------- DELETE ----------
+    if request.method == 'DELETE':
+        if country.cities.exists():
+            return Response(
+                {"message": "Cannot delete country with cities"},
+                status=400
+            )
+
+        country.delete()
+        return Response({"message": "Deleted"}, status=204)
+
+    # ---------- PATCH ----------
+    if request.method == 'PATCH':
+        serializer = CountrySerializer(country, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Updated", "data": serializer.data}
+            )
+
+        return Response(serializer.errors, status=400)
 
     # get object or return 404
     country = get_object_or_404(Country, pk=pk)

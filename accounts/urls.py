@@ -9,4 +9,5 @@ urlpatterns  =[
     # login
     path('login/', views.LoginView.as_view()),
     path('refresh/', TokenRefreshView.as_view()),
+    path('me/', views.me),
 ]

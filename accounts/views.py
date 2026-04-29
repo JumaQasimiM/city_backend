@@ -1,26 +1,32 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from . models import User
 from  . serializers import UserSerializer
 
 from rest_framework import status
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 # jwt login
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.views import TokenObtainPairView
 
+# custom permission
+from helper.permission import IsAdminOrReadOnly
 class LoginView(TokenObtainPairView):
     pass
 
 
-# get all users
+# get all users only admin can see
 @api_view(['GET'])
+@permission_classes([IsAuthenticated,IsAdminOrReadOnly])
 def users(request):
     users = User.objects.all()
-    serializer = UserSerializer(users,many = True)
-    return Response(serializer.data,status=200)
-    
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
 # register  a new user / create a new account
 @api_view(['POST'])
 def register_user(request):
@@ -32,48 +38,51 @@ def register_user(request):
 
 # update , delete and get a user
 @api_view(['GET','DELETE','PATCH'])
-def user_detail(request,pk):
-    # get a user 
-    user = get_object_or_404(User,pk=pk)
+@permission_classes([IsAuthenticated])
+def user_detail(request, pk):
 
-    # ------- GET: get single user -----------
-    if request.method =='GET':
-        serializer = UserSerializer(user)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-     # ------- DELETE: remove user -----------
-    elif request.method == 'DELETE':
-        user.delete()
-        return Response({
-            'success': True,
-            'message': 'User removed successfully.'
-        },
-        status=status.HTTP_204_NO_CONTENT)
-    
-     # ------- PATCH: update a user -----------
-    elif request.method =='PATCH':
-        serializer = UserSerializer(user, data = request.data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {
-                    'success': True,
-                    'message': 'User updated successfully.',
-                    'data': serializer.data
-                },
-                status=status.HTTP_200_OK
-            )
-
+    user = get_object_or_404(User, pk=pk)
+    is_admin = request.user.role =='admin'
+    is_owner = request.user.id ==user.id
+    # فقط ادمین یا خود کاربر
+    if not (is_admin or is_owner):
         return Response(
-            {
-                'success': False,
-                'message': 'Validation error',
-                'errors': serializer.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
+            {"message": "Permission denied"},
+            status=403
         )
 
-# login user
+    # ---------- GET ----------
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    # ---------- DELETE ----------
+    elif request.method == 'DELETE':
+        user.delete()
+        return Response(
+            {"message": "User deleted"},
+            status=204
+
+        )
+    # ---------- PATCH ----------
+    elif request.method == 'PATCH':
+        serializer = UserSerializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "User updated",
+                "data": serializer.data
+            })
+
+        return Response(serializer.errors, status=400)
+    
+# get logedin user
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
 
 # logout user
     

@@ -2,9 +2,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+# for auth and permission
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import City
 from .serializers import CitySerializer
+
 
 """
 City API (DRF - function based views)
@@ -31,6 +35,13 @@ def city_list_create(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     # ---------- POST : create new City-------------- 
     elif request.method =='POST':
+        # jast admin allow to create a city
+        if request.user.role != "admin":
+            return Response(
+                    {"message": "Permission denied"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
         serializer = CitySerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()

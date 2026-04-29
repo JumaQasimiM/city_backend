@@ -17,6 +17,11 @@ class ServiceSerializer(serializers.ModelSerializer):
         model = models.Service
         fields = '__all__'
 
+# 🔹 Place Image
+class PlaceImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PlaceImage
+        fields = '__all__'
 
 # 🔹 Place
 class PlaceSerializer(serializers.ModelSerializer):
@@ -27,9 +32,7 @@ class PlaceSerializer(serializers.ModelSerializer):
     city = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all()
     )
-    owner = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
+    owner = serializers.ReadOnlyField(source="owner.id")
     services = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=models.Service.objects.all()
@@ -41,24 +44,12 @@ class PlaceSerializer(serializers.ModelSerializer):
     owner_detail = UserSerializer(source='owner', read_only=True)
     services_detail = ServiceSerializer(source='services', many=True, read_only=True)
 
+    images = PlaceImageSerializer(many=True, read_only=True)
     class Meta:
         model = models.Place
         fields = '__all__'
 
 
-# 🔹 Place Image
-class PlaceImageSerializer(serializers.ModelSerializer):
-    # write
-    place = serializers.PrimaryKeyRelatedField(
-        queryset=models.Place.objects.all()
-    )
-
-    # read
-    place_detail = PlaceSerializer(source='place', read_only=True)
-
-    class Meta:
-        model = models.PlaceImage
-        fields = '__all__'
 
 
 # 🔹 Comment

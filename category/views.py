@@ -71,6 +71,11 @@
 from rest_framework.viewsets import ModelViewSet
 from . import models
 from . import serializers
+from helper.permission import IsAdminOrReadOnly
+
+
+
 class CategoryViewSet(ModelViewSet):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]

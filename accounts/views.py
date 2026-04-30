@@ -6,7 +6,7 @@ from  . serializers import UserSerializer
 from rest_framework import status
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 
 # jwt login
@@ -14,13 +14,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 # custom permission
 from helper.permission import IsAdminOrReadOnly
+
 class LoginView(TokenObtainPairView):
     pass
 
 
 # get all users only admin can see
 @api_view(['GET'])
-@permission_classes([IsAuthenticated,IsAdminOrReadOnly])
+@permission_classes([IsAdminOrReadOnly])
 def users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
@@ -42,7 +43,8 @@ def register_user(request):
 def user_detail(request, pk):
 
     user = get_object_or_404(User, pk=pk)
-    is_admin = request.user.role =='admin'
+
+    is_admin = getattr(request.user, "role", None) == "admin"
     is_owner = request.user.id ==user.id
     # فقط ادمین یا خود کاربر
     if not (is_admin or is_owner):
@@ -53,8 +55,7 @@ def user_detail(request, pk):
 
     # ---------- GET ----------
     if request.method == 'GET':
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(UserSerializer(user).data)
 
     # ---------- DELETE ----------
     elif request.method == 'DELETE':
@@ -84,7 +85,5 @@ def me(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
-# logout user
-    
 
 

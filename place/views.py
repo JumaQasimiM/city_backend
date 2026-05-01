@@ -65,7 +65,8 @@ class ServiceViewSet(ModelViewSet):
 class PlaceViewSet(ModelViewSet):
    queryset = Place.objects.all()
    serializer_class = PlaceSerializer
-   permission_classes = [IsAdminOrReadOnly]
+   permission_classes = [IsAdminBusinessOrReadOnly]
+
    # filter and search with django filter - library
    filter_backends = [DjangoFilterBackend]
    filterset_fields = ['city', 'category']

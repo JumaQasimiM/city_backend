@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.parsers import MultiPartParser,FormParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 
 from . models import Place,PlaceComment,PlaceImage,PlaceLike,FavoratePlace,Service
 from . serializers import PlaceSerializer,PlaceImageSerializer,ServiceSerializer,PlaceLikeSerializer,PlaceCommentSerializer,FavoritePlaceSerializer
@@ -124,6 +124,21 @@ class PlaceViewSet(ModelViewSet):
    #          queryset = queryset.filter(category_id=category)
 
    #      return queryset
+
+class PlaceCommentViewSet(ModelViewSet):
+    queryset = PlaceComment.objects.all()
+    serializer_class = PlaceCommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['place']  # 🔥 IMPORTANT
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+
+
 
 class PlaceGrowthView(APIView):
     permission_classes = [IsAuthenticated]

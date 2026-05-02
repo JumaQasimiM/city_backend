@@ -60,7 +60,8 @@ class FavoratePlace(models.Model):
     place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='favorates')
 
     def __str__(self):
-        return f'{self.user.username} add to favorate [ {self.place.name} ]' 
+        username = self.user.username if self.user else "Anonymous"
+        return f'{username} add to favorite [{self.place.name}]'
     
 # place commetns 
 class PlaceComment(models.Model):
@@ -69,11 +70,13 @@ class PlaceComment(models.Model):
     comment = models.TextField(null=False,blank=False)
 
     def __str__(self):
-        return f"{self.user.username} comment - [ {self.comment} ] to {self.place.name} "
+        username = self.user.username if self.user else "Anonymous"
+        return f"{username} comment - [{self.comment[:20]}] to {self.place.name}"
 # place like
 class PlaceLike(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,blank=True,related_name='like_uers')
     place = models.ForeignKey(Place,on_delete=models.CASCADE,related_name='likes')
 
     def __str__(self):
-        return f" '{self.user.username}' liked {self.place.name}"
+        username = self.user.username if self.user else "Anonymous"
+        return f"{username} liked {self.place.name}"

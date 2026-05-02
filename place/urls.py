@@ -6,6 +6,7 @@ from .views import PlaceGrowthView
 router = DefaultRouter()
 router.register('places', views.PlaceViewSet)
 router.register('services', views.ServiceViewSet)
+router.register('placeComments', views.PlaceCommentViewSet)
 
 urlpatterns = [
     path("places/growth/", PlaceGrowthView.as_view()),

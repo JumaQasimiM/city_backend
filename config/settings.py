@@ -19,7 +19,7 @@ if not SECRET_KEY:
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # ALLOWED_HOSTS = ["*"]  # بعداً محدودش کن
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1").split(",")
+ALLOWED_HOSTS = ['.onrender.com']
 
 # ================= APPS =================
 AUTH_USER_MODEL = "accounts.User"
@@ -87,7 +87,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://your-app.onrender.com",
+    "https://city-backend-django.onrender.com",
 ]
 # ================= DATABASE =================
 

@@ -9,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ================= SECURITY =================
 # SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
-
+# SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-key")
 if not SECRET_KEY:
     if os.getenv("ENV") == "production":
         raise ValueError("SECRET_KEY is required in production!")
@@ -18,8 +18,6 @@ if not SECRET_KEY:
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# ALLOWED_HOSTS = ["*"]  # بعداً محدودش کن
-ALLOWED_HOSTS = ['.onrender.com']
 
 # ================= APPS =================
 AUTH_USER_MODEL = "accounts.User"
@@ -82,18 +80,38 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # ================= CORS =================
-# CORS_ALLOW_ALL_ORIGINS = True  # بعداً محدود کن
+
+# ALLOWED_HOSTS = ["*"]  # بعداً محدودش کن
+ALLOWED_HOSTS = [
+    "city-backend-django.onrender.com",
+      ".onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
+
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://cityexplor26.netlify.app",
+    "http://localhost:5173",
+]
+
+
+CORS_ALLOW_CREDENTIALS = True
+
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://city-backend-django.onrender.com",
+     "https://cityexplor26.netlify.app",
 ]
 # ================= DATABASE =================
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600
     )
 }

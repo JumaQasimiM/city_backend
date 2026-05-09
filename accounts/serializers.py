@@ -3,75 +3,100 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
+
         fields = [
-            'id', 'first_name', 'last_name',
-            'username', 'email', 'bio',
-            'password', 'avatar', 'role'
+            'id',
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'bio',
+            'password',
+            'avatar',
+            'role',
         ]
+
         read_only_fields = ['id']
+
         extra_kwargs = {
             'password': {'write_only': True},
-            'avatar': {'required': False}
+            'avatar': {'required': False},
         }
 
-    #  username validation
+    # username validation
     def validate_username(self, username):
-        if 'admin' in username:
-            raise serializers.ValidationError('username is not allowed!')
+
+        if 'admin' in username.lower():
+            raise serializers.ValidationError(
+                'Username is not allowed!'
+            )
 
         if len(username) < 3:
             raise serializers.ValidationError(
                 'Username must be at least 3 characters'
             )
+
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError(
+                'Username already exists!'
+            )
+
         return username
 
-    #  email validation
+    # email validation
     def validate_email(self, value):
+
         qs = User.objects.filter(email=value)
 
         if self.instance:
             qs = qs.exclude(id=self.instance.id)
 
         if qs.exists():
-            raise serializers.ValidationError('Email already exists!')
+            raise serializers.ValidationError(
+                'Email already exists!'
+            )
 
         return value
 
-    #  password validation
+    # password validation
     def validate_password(self, password):
+
         if len(password) < 6:
             raise serializers.ValidationError(
                 'Password must be at least 6 characters'
             )
 
-        first_name = self.initial_data.get('first_name')
-        last_name = self.initial_data.get('last_name')
-        email = self.initial_data.get('email')
+        first_name = self.initial_data.get('first_name', '')
+        last_name = self.initial_data.get('last_name', '')
+        email = self.initial_data.get('email', '')
 
-        if first_name and first_name in password:
+        if first_name and first_name.lower() in password.lower():
             raise serializers.ValidationError(
                 'Password must not contain first name'
             )
 
-        if last_name and last_name in password:
+        if last_name and last_name.lower() in password.lower():
             raise serializers.ValidationError(
                 'Password must not contain last name'
             )
 
-        if email and email in password:
+        if email and email.lower() in password.lower():
             raise serializers.ValidationError(
                 'Password must not contain email'
             )
 
         return password
 
-    # hash password
+    # create user
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
-    # update pass
+
+    # update user
     def update(self, instance, validated_data):
+
         password = validated_data.pop('password', None)
 
         for attr, value in validated_data.items():
@@ -81,4 +106,5 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
 
         instance.save()
+
         return instance

@@ -14,7 +14,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=USER_ROLE,
-        default='user'
+        default='business'
     )
 
     bio = models.TextField(blank=True, null=True)

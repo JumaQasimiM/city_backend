@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar': {'required': False}
         }
 
-    # 🔹 username validation
+    #  username validation
     def validate_username(self, username):
         if 'admin' in username:
             raise serializers.ValidationError('username is not allowed!')
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return username
 
-    # 🔹 email validation
+    #  email validation
     def validate_email(self, value):
         qs = User.objects.filter(email=value)
 
@@ -39,7 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return value
 
-    # 🔹 password validation
+    #  password validation
     def validate_password(self, password):
         if len(password) < 6:
             raise serializers.ValidationError(
@@ -67,7 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return password
 
-    # 🔐 hash password
+    # hash password
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
     # update pass
